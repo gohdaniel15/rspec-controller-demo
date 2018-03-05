@@ -1,6 +1,7 @@
 class PostsController < ApplicationController
 
-  before_action :prepare_user, only: [:index, :create]
+  before_action :authenticate_admin!
+  before_action :prepare_user
   before_action :set_post, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -11,7 +12,7 @@ class PostsController < ApplicationController
   end
 
   def new
-    @post = Post.new
+    @post = @user.posts.build
   end
 
   def edit
@@ -21,7 +22,7 @@ class PostsController < ApplicationController
     @post = @user.posts.build(post_params)
 
     if @post.save
-      redirect_to @post, notice: 'Post was successfully created.'
+      redirect_to user_post_path(@user, @post), notice: 'Post was successfully created.'
     else
       render :new
     end
